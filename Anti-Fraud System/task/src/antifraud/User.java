@@ -20,27 +20,19 @@ public class User {
         return name;
     }
     public void setName(String name) {
-        // if (name.isEmpty()) {
-        //     throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        // }
         this.name = name;
     }
     public String getUsername() {
         return username;
     }
     public void setUsername(String username) {
-        // if (username.isEmpty()) {
-        //     throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        // }
         this.username = username;
     }
     public String getPassword() {
         return password;
     }
     public void setPassword(String password) {
-        // if (password.isEmpty()) {
-        //     throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        // }
+
         this.password = password;
     }
     public void setId(Long id) {
