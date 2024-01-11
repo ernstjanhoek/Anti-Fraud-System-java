@@ -27,7 +27,7 @@
                                  .requestMatchers("/actuator/shutdown").permitAll()      // needs to run test
                                  .requestMatchers(HttpMethod.POST, "/api/antifraud/transaction").hasAuthority("USER")
                                  .requestMatchers(HttpMethod.GET, "/api/auth/list").hasAuthority("USER")
-                                 .requestMatchers(HttpMethod.DELETE, "/api/auth/user").hasAuthority("USER")
+                                 .requestMatchers(HttpMethod.DELETE, "/api/auth/user/{username}").hasAuthority("USER")
 
                          // other matchers
                  )
