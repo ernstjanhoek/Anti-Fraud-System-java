@@ -61,13 +61,12 @@ public class AntiFraudController {
         return response;
     }
 
-    @DeleteMapping("/api/auth/user")
-    @ResponseStatus(HttpStatus.OK)
-    public String deleteUser(@RequestParam(value = "username") String username) {
+    @DeleteMapping("/api/auth/user/{username}")
+    public String deleteUser(@PathVariable String username) {
         System.out.println(username);
         Optional<User> dbResult = userRepository.findUserByUsername(username);
         dbResult.ifPresentOrElse(userRepository::delete, () -> { throw new UserNotFoundException(); });
         System.out.println(username);
-        return "{ \"username:\"" + username + "," + "\"status\":" + "Deleted successfully!}";
+        return "{ \"username\":\"" + username + "\"," + "\"status\":" + "\"Deleted successfully!\"}";
     }
 }
