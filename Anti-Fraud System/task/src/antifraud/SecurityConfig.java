@@ -25,10 +25,11 @@
                  .authorizeHttpRequests(requests -> requests                     // manage access
                                  .requestMatchers(HttpMethod.POST, "/api/auth/user").permitAll()
                                  .requestMatchers("/actuator/shutdown").permitAll()      // needs to run test
-                                 .requestMatchers(HttpMethod.POST, "/api/antifraud/transaction").hasAuthority("USER")
-                                 .requestMatchers(HttpMethod.GET, "/api/auth/list").hasAuthority("USER")
-                                 .requestMatchers(HttpMethod.DELETE, "/api/auth/user").hasAuthority("USER")
-
+                                 .requestMatchers(HttpMethod.POST, "/api/antifraud/transaction").hasAuthority("MERCHANT")
+                                 .requestMatchers(HttpMethod.GET, "/api/auth/list").hasAnyAuthority("ADMINISTRATOR", "SUPPORT")
+                                 .requestMatchers(HttpMethod.DELETE, "/api/auth/user/{username}").hasAuthority("ADMINISTRATOR")
+                                 .requestMatchers(HttpMethod.PUT, "/api/auth/access").hasAuthority("ADMINISTRATOR")
+                                 .requestMatchers(HttpMethod.PUT, "/api/auth/role").hasAuthority("ADMINISTRATOR")
                          // other matchers
                  )
                  .sessionManagement(session -> session

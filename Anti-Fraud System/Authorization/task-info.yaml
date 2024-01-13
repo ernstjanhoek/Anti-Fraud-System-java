@@ -1270,6 +1270,27 @@ files:
           };
       }
     learner_created: false
-feedback_link: https://hyperskill.org/projects/232/stages/1163/implement#comment
-status: Unchecked
-record: -1
+  - name: src/antifraud/RoleDTO.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/AccessDTO.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/RoleRequest.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/AccessRequest.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/LockState.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/RoleConflictException.java
+    visible: true
+    learner_created: true
+feedback_link: https://hyperskill.org/learn/step/18069#comment
+status: Failed
+feedback:
+  message: Execution failed
+  time: "Sat, 13 Jan 2024 10:24:17 UTC"
+record: 3

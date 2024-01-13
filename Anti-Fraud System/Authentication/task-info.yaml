@@ -639,9 +639,9 @@ files:
       management.endpoint.shutdown.enabled=true
       spring.jackson.serialization.INDENT_OUTPUT=true
     learner_created: false
-feedback_link: https://hyperskill.org/projects/232/stages/1162/implement#comment
-status: Failed
+feedback_link: https://hyperskill.org/learn/step/18068#comment
+status: Solved
 feedback:
-  message: Execution failed
-  time: "Thu, 11 Jan 2024 19:13:15 UTC"
+  message: Congratulations!
+  time: "Fri, 12 Jan 2024 18:53:00 UTC"
 record: 1

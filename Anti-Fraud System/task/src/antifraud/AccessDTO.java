@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class TransactionDTO {
-    private String result;
+public class AccessDTO {
+    private final String status;
 }
