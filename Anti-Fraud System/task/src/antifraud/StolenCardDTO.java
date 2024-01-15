@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class AccessDTO {
-    private final String status;
+public class StolenCardDTO {
+    private long id;
+    private String number;
 }

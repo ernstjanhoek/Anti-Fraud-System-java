@@ -13,24 +13,35 @@
 
  @Configuration
  public class SecurityConfig {
+     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+
+     public SecurityConfig(RestAuthenticationEntryPoint restAuthenticationEntryPoint) {
+         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
+     }
+
      @Bean
      public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
          return http
                  .httpBasic(Customizer.withDefaults())
                  .csrf(CsrfConfigurer::disable)                           // For modifying requests via Postman
                  .exceptionHandling(handing -> handing
-                     .authenticationEntryPoint(new RestAuthenticationEntryPoint()) // Handles auth error: Voorheen stond hier restAuthenticationEntryPoint als value, maar in het voorbeeld verwees die nergens heen.
+                     .authenticationEntryPoint(restAuthenticationEntryPoint) // Handles auth error: Voorheen stond hier restAuthenticationEntryPoint als value, maar in het voorbeeld verwees die nergens heen.
                  )
                  .headers(headers -> headers.frameOptions().disable())           // for Postman, the H2 console
                  .authorizeHttpRequests(requests -> requests                     // manage access
-                                 .requestMatchers(HttpMethod.POST, "/api/auth/user").permitAll()
-                                 .requestMatchers("/actuator/shutdown").permitAll()      // needs to run test
-                                 .requestMatchers(HttpMethod.POST, "/api/antifraud/transaction").hasAuthority("MERCHANT")
-                                 .requestMatchers(HttpMethod.GET, "/api/auth/list").hasAnyAuthority("ADMINISTRATOR", "SUPPORT")
-                                 .requestMatchers(HttpMethod.DELETE, "/api/auth/user/{username}").hasAuthority("ADMINISTRATOR")
-                                 .requestMatchers(HttpMethod.PUT, "/api/auth/access").hasAuthority("ADMINISTRATOR")
-                                 .requestMatchers(HttpMethod.PUT, "/api/auth/role").hasAuthority("ADMINISTRATOR")
-                         // other matchers
+                         .requestMatchers(HttpMethod.POST, "/api/auth/user").permitAll()
+                         .requestMatchers("/actuator/shutdown").permitAll()      // needs to run test
+                         .requestMatchers(HttpMethod.POST, "/api/antifraud/transaction").hasAuthority("MERCHANT")
+                         .requestMatchers(HttpMethod.GET, "/api/auth/list/**").hasAnyAuthority("ADMINISTRATOR", "SUPPORT")
+                         .requestMatchers(HttpMethod.DELETE, "/api/auth/user/{username}").hasAuthority("ADMINISTRATOR")
+                         .requestMatchers(HttpMethod.PUT, "/api/auth/access/**").hasAuthority("ADMINISTRATOR")
+                         .requestMatchers(HttpMethod.PUT, "/api/auth/role/**").hasAuthority("ADMINISTRATOR")
+                         .requestMatchers(HttpMethod.GET, "/api/antifraud/stolencard").hasAuthority("SUPPORT")
+                         .requestMatchers(HttpMethod.POST, "/api/antifraud/stolencard").hasAuthority("SUPPORT")
+                         .requestMatchers(HttpMethod.DELETE, "/api/antifraud/stolencard/{number}").hasAuthority("SUPPORT")
+                         .requestMatchers(HttpMethod.GET, "/api/antifraud/suspicious-ip").hasAuthority("SUPPORT")
+                         .requestMatchers(HttpMethod.POST, "/api/antifraud/suspicious-ip").hasAuthority("SUPPORT")
+                         .requestMatchers(HttpMethod.DELETE, "/api/antifraud/suspicious-ip/{ip}").hasAuthority("SUPPORT")
                  )
                  .sessionManagement(session -> session
                          .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // no session

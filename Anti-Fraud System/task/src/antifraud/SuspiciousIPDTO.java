@@ -5,9 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class RoleDTO {
+public class SuspiciousIPDTO {
     private long id;
-    private String username;
-    private String name;
-    private String role;
+    private String ip;
 }
