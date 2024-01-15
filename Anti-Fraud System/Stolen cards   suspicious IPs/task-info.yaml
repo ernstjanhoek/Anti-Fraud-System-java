@@ -1671,4 +1671,7 @@ files:
     learner_created: true
 feedback_link: https://hyperskill.org/learn/step/18070#comment
 status: Failed
+feedback:
+  message: Execution failed
+  time: "Mon, 15 Jan 2024 21:19:42 UTC"
 record: 4
