@@ -1,5 +1,17 @@
 package antifraud;
 
 public enum LockState {
-    LOCKED, UNLOCKED
+    LOCK, UNLOCK;
+    public boolean isState(LockState value) {
+        return this.equals(value);
+    }
+
+    @Override
+    public String toString() {
+        if (this == LockState.LOCK) {
+            return "locked";
+        } else {
+            return "unlocked";
+        }
+    }
 }

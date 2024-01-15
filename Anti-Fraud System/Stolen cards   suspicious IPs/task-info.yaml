@@ -581,35 +581,6 @@ files:
           }
       }
     learner_created: false
-  - name: src/antifraud/UserExistsException.java
-    visible: true
-    text: |
-      package antifraud;
-      
-      
-      import org.springframework.http.HttpStatus;
-      import org.springframework.web.bind.annotation.ResponseStatus;
-      @ResponseStatus(HttpStatus.CONFLICT)
-      public class UserExistsException extends RuntimeException {
-          public UserExistsException() {
-              super();
-          }
-      }
-    learner_created: false
-  - name: src/antifraud/UserNotFoundException.java
-    visible: true
-    text: |-
-      package antifraud;
-      
-      import org.springframework.http.HttpStatus;
-      import org.springframework.web.bind.annotation.ResponseStatus;
-      @ResponseStatus(HttpStatus.NOT_FOUND)
-      public class UserNotFoundException extends RuntimeException {
-          public UserNotFoundException() {
-              super();
-          }
-      }
-    learner_created: false
   - name: test/AntiFraudTest.java
     visible: false
     text: |-
@@ -1647,6 +1618,39 @@ files:
           };
       }
     learner_created: false
+  - name: src/antifraud/NotFoundException.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/StolenCardRepository.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/LockStateException.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/SuspiciousIP.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/StolenCardDTO.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/StolenCardRequest.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/SuspiciousIPDTO.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/StolenCard.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/SuspiciousIPRequest.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/ExistsException.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/SuspiciousIPRepository.java
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/18070#comment
-status: Unchecked
-record: -1
+status: Failed
+record: 4

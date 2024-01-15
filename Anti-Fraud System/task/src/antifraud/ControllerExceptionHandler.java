@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
-    @ExceptionHandler(UserExistsException.class)
+    @ExceptionHandler(ExistsException.class)
     public ResponseEntity<String> handleUserExists() {
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
@@ -20,8 +20,12 @@ public class ControllerExceptionHandler {
     public ResponseEntity<String> handleInvalidArgument() {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(UserNotFoundException.class)
+    @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handleUserNotFound() {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(LockStateException.class)
+    public ResponseEntity<String> handleLockState() {
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }

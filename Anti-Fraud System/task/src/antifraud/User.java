@@ -23,5 +23,5 @@ public class User {
     @NonNull
     private String password;
     private String authority;
-    private LockState lockstate = LockState.LOCKED;
+    private LockState lockstate = LockState.LOCK;
 }

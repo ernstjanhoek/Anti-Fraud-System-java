@@ -3,11 +3,13 @@ package antifraud;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor(force = true)
 public class AccessRequest {
     @NotBlank
     private final String username;
-    @Pattern(regexp = "LOCKED|UNLOCKED")
-    private final String lockState;
+    // @Pattern(regexp = "LOCK|UNLOCK")
+    private final String operation;
 }
