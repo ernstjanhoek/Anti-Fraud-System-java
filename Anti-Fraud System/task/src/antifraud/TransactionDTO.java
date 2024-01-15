@@ -7,4 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class TransactionDTO {
     private String result;
+    private String info;
 }

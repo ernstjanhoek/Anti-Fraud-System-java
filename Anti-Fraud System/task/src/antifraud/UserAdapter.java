@@ -13,9 +13,7 @@ public class UserAdapter implements UserDetails {
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("MERCHANT"),
-                new SimpleGrantedAuthority("SUPPORT"),
-                new SimpleGrantedAuthority("ADMINISTRATOR"));
+        return List.of(new SimpleGrantedAuthority(user.getAuthority()));
     }
     @Override
     public String getPassword() {

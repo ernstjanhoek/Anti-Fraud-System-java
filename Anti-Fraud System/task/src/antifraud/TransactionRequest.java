@@ -8,4 +8,6 @@ import lombok.Data;
 public class TransactionRequest {
     @Min(1)
     private long amount;
+    String ip;
+    String number;
 }
