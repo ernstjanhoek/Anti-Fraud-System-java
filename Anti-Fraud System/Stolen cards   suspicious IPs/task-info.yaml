@@ -1648,6 +1648,30 @@ files:
   - name: src/antifraud/SuspiciousIPRepository.java
     visible: true
     learner_created: true
+  - name: src/antifraud/LockStateException.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/AccessRequest.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/LockState.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/RoleRequest.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/RoleDTO.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/RoleConflictException.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/AccessDTO.java
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/18070#comment
 status: Failed
+feedback:
+  message: Execution failed
+  time: "Mon, 15 Jan 2024 21:19:42 UTC"
 record: 4

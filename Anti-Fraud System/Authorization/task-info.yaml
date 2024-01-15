@@ -1288,9 +1288,9 @@ files:
   - name: src/antifraud/RoleConflictException.java
     visible: true
     learner_created: true
-  - name: src/antifraud/LockStateException.java
-    visible: true
-    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/18069#comment
 status: Solved
+feedback:
+  message: Congratulations!
+  time: "Mon, 15 Jan 2024 19:41:30 UTC"
 record: 3
