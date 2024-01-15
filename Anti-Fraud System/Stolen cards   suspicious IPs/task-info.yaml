@@ -566,21 +566,6 @@ files:
           jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
       }
     learner_created: false
-  - name: src/antifraud/AntiFraudApplication.java
-    visible: true
-    text: |-
-      package antifraud;
-      
-      import org.springframework.boot.SpringApplication;
-      import org.springframework.boot.autoconfigure.SpringBootApplication;
-      
-      @SpringBootApplication
-      public class AntiFraudApplication {
-          public static void main(String[] args) {
-              SpringApplication.run(AntiFraudApplication.class, args);
-          }
-      }
-    learner_created: false
   - name: test/AntiFraudTest.java
     visible: false
     text: |-
@@ -1618,10 +1603,34 @@ files:
           };
       }
     learner_created: false
+  - name: src/antifraud/AntiFraudApplication.java
+    visible: true
+    text: |-
+      package antifraud;
+      
+      import org.springframework.boot.SpringApplication;
+      import org.springframework.boot.autoconfigure.SpringBootApplication;
+      
+      @SpringBootApplication
+      public class AntiFraudApplication {
+          public static void main(String[] args) {
+              SpringApplication.run(AntiFraudApplication.class, args);
+          }
+      }
+    learner_created: false
+  - name: src/antifraud/LockStateException.java
+    visible: true
+    learner_created: true
   - name: src/antifraud/StolenCardRepository.java
     visible: true
     learner_created: true
+  - name: src/antifraud/ExistsException.java
+    visible: true
+    learner_created: true
   - name: src/antifraud/SuspiciousIP.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/SuspiciousIPDTO.java
     visible: true
     learner_created: true
   - name: src/antifraud/StolenCardRequest.java
@@ -1630,48 +1639,18 @@ files:
   - name: src/antifraud/StolenCard.java
     visible: true
     learner_created: true
-  - name: src/antifraud/SuspiciousIPRequest.java
-    visible: true
-    learner_created: true
-  - name: src/antifraud/SuspiciousIPRepository.java
-    visible: true
-    learner_created: true
-  - name: src/antifraud/RoleConflictException.java
-    visible: true
-    learner_created: true
-  - name: src/antifraud/LockState.java
-    visible: true
-    learner_created: true
-  - name: src/antifraud/AccessDTO.java
-    visible: true
-    learner_created: true
-  - name: src/antifraud/RoleDTO.java
-    visible: true
-    learner_created: true
-  - name: src/antifraud/LockStateException.java
-    visible: true
-    learner_created: true
-  - name: src/antifraud/AccessRequest.java
-    visible: true
-    learner_created: true
-  - name: src/antifraud/RoleRequest.java
-    visible: true
-    learner_created: true
-  - name: src/antifraud/ExistsException.java
-    visible: true
-    learner_created: true
-  - name: src/antifraud/SuspiciousIPDTO.java
-    visible: true
-    learner_created: true
   - name: src/antifraud/StolenCardDTO.java
     visible: true
     learner_created: true
   - name: src/antifraud/NotFoundException.java
     visible: true
     learner_created: true
+  - name: src/antifraud/SuspiciousIPRepository.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/SuspiciousIPRequest.java
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/18070#comment
 status: Failed
-feedback:
-  message: Execution failed
-  time: "Mon, 15 Jan 2024 21:19:42 UTC"
 record: 4
