@@ -19,6 +19,9 @@ public class Transaction {
             return TransactionProcess.PROHIBITED;
         }
     }
+    public String infoStringBuilder() {
+       return null;
+    }
     public enum TransactionProcess {
         ALLOWED, PROHIBITED, MANUAL_PROCESSING
     }
