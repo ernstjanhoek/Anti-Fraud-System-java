@@ -151,9 +151,6 @@ public class AntiFraudController {
     }
     @PostMapping("/api/antifraud/suspicious-ip")
     public SuspiciousIPDTO postSuspiciousIP(@Valid @RequestBody SuspiciousIPRequest request) {
-        if (!request.validateIP()) {
-            throw new InvalidInputException();
-        }
         if (suspiciousIPRepository.findSuspiciousIPByIpAddress(request.getIp()).isPresent()) {
             throw new ExistsException();
         }
