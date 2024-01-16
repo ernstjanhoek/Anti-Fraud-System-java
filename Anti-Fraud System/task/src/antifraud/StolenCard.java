@@ -17,8 +17,4 @@ public class StolenCard {
     private long id;
     @NonNull
     private String number;
-
-    public boolean luhnCheck() {
-       return true;
-    }
 }

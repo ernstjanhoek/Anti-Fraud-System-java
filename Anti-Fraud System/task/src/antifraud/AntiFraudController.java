@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -29,12 +28,27 @@ public class AntiFraudController {
     }
     @PostMapping("/api/antifraud/transaction")
     public TransactionDTO postTransaction(Principal principal, @Valid @RequestBody TransactionRequest request) {
-        if (userRepository.findUserByUsername(principal.getName()).get().getLockstate().isState(LockState.UNLOCK)) {
-            Transaction transaction = new Transaction(request.getAmount(), 200L, 1500L);
-            return new TransactionDTO(transaction.validateInput().toString(), transaction.getInfoString());
-        } else {
+        if (userRepository.findUserByUsername(principal.getName()).get().getLockstate().isState(LockState.LOCK)) {
             throw new LockStateException();
         }
+        Transaction transaction = new Transaction(request.getAmount(), 200L, 1500L);
+        Transaction.TransactionProcess processStatus = Transaction.TransactionProcess.ALLOWED;
+        if (suspiciousIPRepository.findSuspiciousIPByIpAddress(request.getIp()).isPresent()) {
+            processStatus = Transaction.TransactionProcess.PROHIBITED;
+            transaction.appendInfo("ip");
+        }
+        if (stolenCardRepository.findStolenCardByNumber(request.getNumber()).isPresent()) {
+            processStatus = Transaction.TransactionProcess.PROHIBITED;
+            transaction.appendInfo("card-number");
+        }
+        if (request.getAmount() > transaction.getManualLimit()) {
+            processStatus = Transaction.TransactionProcess.PROHIBITED;
+            transaction.appendInfo("amount");
+        } else if (request.getAmount() > transaction.getAllowedLimit() && processStatus == Transaction.TransactionProcess.ALLOWED) {
+            processStatus = Transaction.TransactionProcess.MANUAL_PROCESSING;
+            transaction.appendInfo("amount");
+        }
+        return new TransactionDTO(processStatus.toString(), transaction.buildInfoString());
     }
 
     @PostMapping("/api/auth/user")
@@ -102,8 +116,10 @@ public class AntiFraudController {
         return new AccessDTO("User " + request.getUsername() + " " + LockState.valueOf(request.getOperation().toUpperCase()) + "!");
     }
     @PostMapping("/api/antifraud/stolencard")
-    @ResponseStatus(HttpStatus.CREATED)
     public StolenCardDTO postCard(@Valid @RequestBody StolenCardRequest request) {
+        if (!LuhnCheck.cardNumValidation(request.getNumber()) || !LuhnCheck.isValidLuhn(request.getNumber())) {
+            throw new InvalidInputException();
+        }
         if (stolenCardRepository.findStolenCardByNumber(request.getNumber()).isPresent()) {
             throw new ExistsException();
         }
@@ -126,6 +142,9 @@ public class AntiFraudController {
     }
     @DeleteMapping("/api/antifraud/stolencard/{number}")
     public String deleteCard(@PathVariable String number) {
+        if (!LuhnCheck.cardNumValidation(number) || !LuhnCheck.isValidLuhn(number)) {
+            throw new InvalidInputException();
+        }
         Optional<StolenCard> dbResult = stolenCardRepository.findStolenCardByNumber(number);
         dbResult.ifPresentOrElse(stolenCardRepository::delete, () -> { throw new NotFoundException();});
         return "{ \"status\": \"Card " + dbResult.get().getNumber() + " successfully removed!\"}";
@@ -133,7 +152,7 @@ public class AntiFraudController {
     @PostMapping("/api/antifraud/suspicious-ip")
     public SuspiciousIPDTO postSuspiciousIP(@Valid @RequestBody SuspiciousIPRequest request) {
         if (!request.validateIP()) {
-            throw new InvalidIPException();
+            throw new InvalidInputException();
         }
         if (suspiciousIPRepository.findSuspiciousIPByIpAddress(request.getIp()).isPresent()) {
             throw new ExistsException();
@@ -158,7 +177,7 @@ public class AntiFraudController {
     @DeleteMapping("/api/antifraud/suspicious-ip/{ip}")
     public String deleteIP(@PathVariable String ip) {
         if (!ip.matches("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$")) {
-            throw new InvalidIPException();
+            throw new InvalidInputException();
         }
         Optional<SuspiciousIP> dbResult = suspiciousIPRepository.findSuspiciousIPByIpAddress(ip);
         dbResult.ifPresentOrElse(suspiciousIPRepository::delete, () -> { throw new NotFoundException();});

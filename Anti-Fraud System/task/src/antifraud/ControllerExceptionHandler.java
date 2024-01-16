@@ -20,7 +20,7 @@ public class ControllerExceptionHandler {
     public ResponseEntity<String> handleInvalidArgument() {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(InvalidIPException.class)
+    @ExceptionHandler(InvalidInputException.class)
     public ResponseEntity<String> handleInvalidIp() {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }

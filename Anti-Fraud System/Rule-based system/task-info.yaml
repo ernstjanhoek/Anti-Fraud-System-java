@@ -580,35 +580,6 @@ files:
           }
       }
     learner_created: false
-  - name: src/antifraud/UserExistsException.java
-    visible: true
-    text: |
-      package antifraud;
-      
-      
-      import org.springframework.http.HttpStatus;
-      import org.springframework.web.bind.annotation.ResponseStatus;
-      @ResponseStatus(HttpStatus.CONFLICT)
-      public class UserExistsException extends RuntimeException {
-          public UserExistsException() {
-              super();
-          }
-      }
-    learner_created: false
-  - name: src/antifraud/UserNotFoundException.java
-    visible: true
-    text: |-
-      package antifraud;
-      
-      import org.springframework.http.HttpStatus;
-      import org.springframework.web.bind.annotation.ResponseStatus;
-      @ResponseStatus(HttpStatus.NOT_FOUND)
-      public class UserNotFoundException extends RuntimeException {
-          public UserNotFoundException() {
-              super();
-          }
-      }
-    learner_created: false
   - name: test/AntiFraudTest.java
     visible: false
     text: |-
@@ -1861,6 +1832,220 @@ files:
           };
       }
     learner_created: false
+  - name: src/antifraud/NotFoundException.java
+    visible: true
+    text: |-
+      package antifraud;
+      
+      import org.springframework.http.HttpStatus;
+      import org.springframework.web.bind.annotation.ResponseStatus;
+      @ResponseStatus(HttpStatus.NOT_FOUND)
+      public class NotFoundException extends RuntimeException {
+          public NotFoundException() {
+              super();
+          }
+      }
+    learner_created: true
+  - name: src/antifraud/LuhnCheck.java
+    visible: true
+    text: |
+      package antifraud;
+      
+      public class LuhnCheck {
+          static boolean cardNumValidation(String number) {
+              return number.length() == 16 && number.matches("^[0-9]+$");
+          }
+          static boolean isValidLuhn(String number) {
+              int checksum = Character.getNumericValue(number.charAt(number.length() - 1));
+              int total = 0;
+      
+              for (int i = number.length() - 2; i >= 0; i--) {
+                  int sum = 0;
+                  int digit = Character.getNumericValue(number.charAt(i));
+                  if (i % 2 == 0) {
+                      digit *= 2;
+                  }
+                  sum = digit / 10 + digit % 10;
+                  total += sum;
+              }
+              return 10 - total % 10 == checksum;
+          }
+      }
+    learner_created: true
+  - name: src/antifraud/InvalidInputException.java
+    visible: true
+    text: |
+      package antifraud;
+      
+      public class InvalidInputException extends RuntimeException {
+          public InvalidInputException() {
+              super();
+          }
+      }
+    learner_created: true
+  - name: src/antifraud/StolenCardRepository.java
+    visible: true
+    text: |
+      package antifraud;
+      
+      import org.springframework.data.repository.CrudRepository;
+      import java.util.Optional;
+      
+      public interface StolenCardRepository extends CrudRepository<StolenCard, Integer> {
+          Optional<StolenCard> findStolenCardByNumber(String number);
+      }
+    learner_created: true
+  - name: src/antifraud/LockStateException.java
+    visible: true
+    text: |
+      package antifraud;
+      
+      public class LockStateException extends RuntimeException {
+          public LockStateException() {
+              super();
+          }
+      }
+    learner_created: true
+  - name: src/antifraud/SuspiciousIP.java
+    visible: true
+    text: |-
+      package antifraud;
+      
+      import jakarta.persistence.*;
+      import jakarta.validation.constraints.Pattern;
+      import lombok.Data;
+      import lombok.NoArgsConstructor;
+      import lombok.NonNull;
+      import lombok.RequiredArgsConstructor;
+      
+      @Entity
+      @Table(name = "suspicious_ip")
+      @Data
+      @NoArgsConstructor
+      @RequiredArgsConstructor
+      public class SuspiciousIP {
+          @Id
+          @GeneratedValue
+          private Long id;
+          @NonNull
+          @Column(name = "ip")
+          private String ipAddress;
+      }
+    learner_created: true
+  - name: src/antifraud/StolenCardRequest.java
+    visible: true
+    text: |
+      package antifraud;
+      
+      import jakarta.validation.constraints.NotBlank;
+      import lombok.Data;
+      
+      @Data
+      public class StolenCardRequest {
+          @NotBlank
+          private String number;
+      }
+    learner_created: true
+  - name: src/antifraud/StolenCardDTO.java
+    visible: true
+    text: |
+      package antifraud;
+      
+      import lombok.AllArgsConstructor;
+      import lombok.Data;
+      
+      @Data
+      @AllArgsConstructor
+      public class StolenCardDTO {
+          private long id;
+          private String number;
+      }
+    learner_created: true
+  - name: src/antifraud/SuspiciousIPDTO.java
+    visible: true
+    text: |
+      package antifraud;
+      
+      import lombok.AllArgsConstructor;
+      import lombok.Data;
+      
+      @Data
+      @AllArgsConstructor
+      public class SuspiciousIPDTO {
+          private long id;
+          private String ip;
+      }
+    learner_created: true
+  - name: src/antifraud/StolenCard.java
+    visible: true
+    text: |
+      package antifraud;
+      
+      import jakarta.persistence.Entity;
+      import jakarta.persistence.GeneratedValue;
+      import jakarta.persistence.Id;
+      import lombok.AllArgsConstructor;
+      import lombok.Data;
+      import lombok.NoArgsConstructor;
+      import lombok.NonNull;
+      
+      @Entity
+      @Data
+      @NoArgsConstructor
+      public class StolenCard {
+          @Id
+          @GeneratedValue
+          private long id;
+          @NonNull
+          private String number;
+      }
+    learner_created: true
+  - name: src/antifraud/SuspiciousIPRequest.java
+    visible: true
+    text: |
+      package antifraud;
+      
+      import jakarta.validation.constraints.NotBlank;
+      import lombok.AllArgsConstructor;
+      import lombok.Data;
+      
+      @Data
+      public class SuspiciousIPRequest {
+          @NotBlank
+          private String ip;
+          public boolean validateIP() {
+              return this.ip.matches("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$");
+          }
+      }
+    learner_created: true
+  - name: src/antifraud/ExistsException.java
+    visible: true
+    text: |
+      package antifraud;
+      
+      
+      import org.springframework.http.HttpStatus;
+      import org.springframework.web.bind.annotation.ResponseStatus;
+      @ResponseStatus(HttpStatus.CONFLICT)
+      public class ExistsException extends RuntimeException {
+          public ExistsException() {
+              super();
+          }
+      }
+    learner_created: true
+  - name: src/antifraud/SuspiciousIPRepository.java
+    visible: true
+    text: |
+      package antifraud;
+      
+      import org.springframework.data.repository.CrudRepository;
+      import java.util.Optional;
+      
+      public interface SuspiciousIPRepository  extends CrudRepository<SuspiciousIP, Integer> {
+          Optional<SuspiciousIP> findSuspiciousIPByIpAddress(String IpAddress);
+      
+      }
+    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/18071#comment
 status: Unchecked
 record: -1
