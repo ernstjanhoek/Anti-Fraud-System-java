@@ -15,23 +15,31 @@ public class AntiFraudController {
     private final UserRepository userRepository;
     private final SuspiciousIPRepository suspiciousIPRepository;
     private final StolenCardRepository stolenCardRepository;
+    private final TransactionRepository transactionRepository;
     private final PasswordEncoder passwordEncoder;
     public AntiFraudController(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             SuspiciousIPRepository suspiciousIPRepository,
-            StolenCardRepository stolenCardRepository) {
+            StolenCardRepository stolenCardRepository,
+            TransactionRepository transactionRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.suspiciousIPRepository = suspiciousIPRepository;
         this.stolenCardRepository = stolenCardRepository;
+        this.transactionRepository = transactionRepository;
     }
     @PostMapping("/api/antifraud/transaction")
     public TransactionDTO postTransaction(Principal principal, @Valid @RequestBody TransactionRequest request) {
         if (userRepository.findUserByUsername(principal.getName()).get().getLockstate().isState(LockState.LOCK)) {
             throw new LockStateException();
         }
-        Transaction transaction = new Transaction(request.getAmount(), 200L, 1500L);
+        Transaction transaction = new Transaction(request.getAmount(),
+                request.getRegion(),
+                request.getDate(),
+                200L,
+                1500L
+        );
         Transaction.TransactionProcess processStatus = Transaction.TransactionProcess.ALLOWED;
         if (suspiciousIPRepository.findSuspiciousIPByIpAddress(request.getIp()).isPresent()) {
             processStatus = Transaction.TransactionProcess.PROHIBITED;

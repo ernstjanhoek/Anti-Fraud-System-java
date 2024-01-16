@@ -12,6 +12,21 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/Anti-Fraud System/task" />
+            <option value="$PROJECT_DIR$/Anti-Fraud System/task/build/classes/java" />
+            <option value="$PROJECT_DIR$/Anti-Fraud System/task/build/generated/sources/annotationProcessor/java" />
+            <option value="$PROJECT_DIR$/Anti-Fraud System/task/build/generated/sources/headers/java" />
+            <option value="$PROJECT_DIR$/Anti-Fraud System/task/build/reports/tests" />
+            <option value="$PROJECT_DIR$/Anti-Fraud System/task/build/test-results" />
+            <option value="$PROJECT_DIR$/Anti-Fraud System/task/build/tmp" />
+            <option value="$PROJECT_DIR$/Topics/Function composition/Disjunct all" />
+            <option value="$PROJECT_DIR$/Topics/Function composition/How to compose predicates together" />
+            <option value="$PROJECT_DIR$/Topics/Function composition/Theory" />
+            <option value="$PROJECT_DIR$/Topics/Function composition/What function is executed first" />
+            <option value="$PROJECT_DIR$/Topics/Infinite streams/Generating cats" />
+            <option value="$PROJECT_DIR$/Topics/Infinite streams/Making a stream finite" />
+            <option value="$PROJECT_DIR$/Topics/Infinite streams/Making a stream finite (1)" />
+            <option value="$PROJECT_DIR$/Topics/Infinite streams/Powers of two" />
+            <option value="$PROJECT_DIR$/Topics/Infinite streams/Theory" />
             <option value="$PROJECT_DIR$/util" />
           </set>
         </option>
