@@ -20,6 +20,10 @@ public class ControllerExceptionHandler {
     public ResponseEntity<String> handleInvalidArgument() {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(InvalidIPException.class)
+    public ResponseEntity<String> handleInvalidIp() {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handleUserNotFound() {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);

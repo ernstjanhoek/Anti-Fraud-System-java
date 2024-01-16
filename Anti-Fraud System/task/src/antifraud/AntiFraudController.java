@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -29,8 +30,8 @@ public class AntiFraudController {
     @PostMapping("/api/antifraud/transaction")
     public TransactionDTO postTransaction(Principal principal, @Valid @RequestBody TransactionRequest request) {
         if (userRepository.findUserByUsername(principal.getName()).get().getLockstate().isState(LockState.UNLOCK)) {
-            Transaction transaction = new Transaction(request.getAmount(), 200, 1500);
-            return new TransactionDTO(transaction.validateInput().toString(), "amount");
+            Transaction transaction = new Transaction(request.getAmount(), 200L, 1500L);
+            return new TransactionDTO(transaction.validateInput().toString(), transaction.getInfoString());
         } else {
             throw new LockStateException();
         }
@@ -127,11 +128,13 @@ public class AntiFraudController {
     public String deleteCard(@PathVariable String number) {
         Optional<StolenCard> dbResult = stolenCardRepository.findStolenCardByNumber(number);
         dbResult.ifPresentOrElse(stolenCardRepository::delete, () -> { throw new NotFoundException();});
-        return "{ \"status\": \"Card\"" + dbResult.get().getNumber() + "\" successfully removed!\"}";
+        return "{ \"status\": \"Card " + dbResult.get().getNumber() + " successfully removed!\"}";
     }
     @PostMapping("/api/antifraud/suspicious-ip")
-    @ResponseStatus(HttpStatus.CREATED)
     public SuspiciousIPDTO postSuspiciousIP(@Valid @RequestBody SuspiciousIPRequest request) {
+        if (!request.validateIP()) {
+            throw new InvalidIPException();
+        }
         if (suspiciousIPRepository.findSuspiciousIPByIpAddress(request.getIp()).isPresent()) {
             throw new ExistsException();
         }
@@ -141,7 +144,7 @@ public class AntiFraudController {
         return new SuspiciousIPDTO(ip.getId(), ip.getIpAddress());
     }
     @GetMapping("/api/antifraud/suspicious-ip")
-    public ArrayList<SuspiciousIPDTO> fnGetIP() {
+    public ArrayList<SuspiciousIPDTO> getIP() {
         ArrayList<SuspiciousIPDTO> response = new ArrayList<>();
         Iterable<SuspiciousIP> dbResults = suspiciousIPRepository.findAll();
         dbResults.forEach(e -> response.add(
@@ -154,8 +157,11 @@ public class AntiFraudController {
     }
     @DeleteMapping("/api/antifraud/suspicious-ip/{ip}")
     public String deleteIP(@PathVariable String ip) {
+        if (!ip.matches("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$")) {
+            throw new InvalidIPException();
+        }
         Optional<SuspiciousIP> dbResult = suspiciousIPRepository.findSuspiciousIPByIpAddress(ip);
         dbResult.ifPresentOrElse(suspiciousIPRepository::delete, () -> { throw new NotFoundException();});
-        return "{ \"status\": \"IP\"" + dbResult.get().getIpAddress() + "\" successfully removed!\"}";
+        return "{ \"status\": \"IP " + dbResult.get().getIpAddress() + " successfully removed!\"}";
     }
 }

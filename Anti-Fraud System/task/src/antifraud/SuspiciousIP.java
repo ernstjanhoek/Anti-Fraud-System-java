@@ -17,7 +17,6 @@ public class SuspiciousIP {
     @GeneratedValue
     private Long id;
     @NonNull
-    @Pattern(regexp = "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$" )
     @Column(name = "ip")
     private String ipAddress;
 }
