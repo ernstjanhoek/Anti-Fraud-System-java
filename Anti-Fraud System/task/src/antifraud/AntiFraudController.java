@@ -40,6 +40,12 @@ public class AntiFraudController {
                 200L,
                 1500L
         );
+        transactionRepository.save(transaction);
+        System.out.println(transactionRepository.checkIp()); //request.getDate().minusHours(1)));
+        System.out.println(request.getDate());
+        System.out.println(request.getDate().minusHours(1));
+
+        // System.out.println(transactionRepository.checkRegion(request.getDate()));
         Transaction.TransactionProcess processStatus = Transaction.TransactionProcess.ALLOWED;
         if (suspiciousIPRepository.findSuspiciousIPByIpAddress(request.getIp()).isPresent()) {
             processStatus = Transaction.TransactionProcess.PROHIBITED;
@@ -52,7 +58,7 @@ public class AntiFraudController {
         if (request.getAmount() > transaction.getManualLimit()) {
             processStatus = Transaction.TransactionProcess.PROHIBITED;
             transaction.appendInfo("amount");
-        } else if (request.getAmount() > transaction.getAllowedLimit() && processStatus == Transaction.TransactionProcess.ALLOWED) {
+        } else if (request.getAmount() > transaction.getAllowedLimit() && processStatus != Transaction.TransactionProcess.PROHIBITED) {
             processStatus = Transaction.TransactionProcess.MANUAL_PROCESSING;
             transaction.appendInfo("amount");
         }
