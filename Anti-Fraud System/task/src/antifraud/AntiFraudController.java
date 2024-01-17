@@ -44,10 +44,9 @@ public class AntiFraudController {
                 1500L
         );
         transactionRepository.save(transaction);
-        System.out.println(transactionRepository.checkIp()); //request.getDate().minusHours(1)));
-        System.out.println(request.getDate());
-        System.out.println(request.getDate().minusHours(1));
-        // System.out.println(transactionRepository.checkRegion(request.getDate()));
+        System.out.println("Total entries:" + transactionRepository.count());
+        System.out.println("IpCheck: " + transactionRepository.checkIp(request.getDate(), request.getIp()));
+        System.out.println("RegionCheck: " + transactionRepository.checkRegion(request.getDate(), request.getRegion()));
         Transaction.TransactionProcess processStatus = Transaction.TransactionProcess.ALLOWED;
         if (suspiciousIPRepository.findSuspiciousIPByIpAddress(request.getIp()).isPresent()) {
             processStatus = Transaction.TransactionProcess.PROHIBITED;

@@ -7,9 +7,9 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 
 public interface TransactionRepository extends CrudRepository<Transaction, Integer> {
-    @Query("SELECT count(DISTINCT t.ip) FROM Transaction t") // WHERE t.date >= :time")
-    Integer checkIp(); //@Param("time") LocalDateTime time);
+    @Query("SELECT count(DISTINCT t.ip) FROM Transaction t WHERE t.date >= :time AND t.ip != :ip")
+    Integer checkIp(@Param("time") LocalDateTime time, @Param("ip") String ip);
 
-    // @Query("Select count(*) from Transaction t where t.date >= :time LIMIT 3")
-    // Integer checkRegion(@Param("time") LocalDateTime time);
+    @Query("SELECT count(DISTINCT t.region) FROM Transaction t WHERE t.date >= :time AND t.region != :region ")
+    Integer checkRegion(@Param("time") LocalDateTime time, @Param("region") String region);
 }
