@@ -21,7 +21,9 @@ public class Transaction {
     private long id;
     @NonNull
     private Long amount;
+    @NonNull
     private String ip;
+    @NonNull
     private String number;
     @NonNull
     @Pattern(regexp = "EAP|ECA|HIC|LAC|MENA|SA|SSA")

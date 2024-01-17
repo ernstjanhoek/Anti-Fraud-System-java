@@ -34,7 +34,10 @@ public class AntiFraudController {
         if (userRepository.findUserByUsername(principal.getName()).get().getLockstate().isState(LockState.LOCK)) {
             throw new LockStateException();
         }
-        Transaction transaction = new Transaction(request.getAmount(),
+        Transaction transaction = new Transaction(
+                request.getAmount(),
+                request.getIp(),
+                request.getNumber(),
                 request.getRegion(),
                 request.getDate(),
                 200L,
@@ -44,7 +47,6 @@ public class AntiFraudController {
         System.out.println(transactionRepository.checkIp()); //request.getDate().minusHours(1)));
         System.out.println(request.getDate());
         System.out.println(request.getDate().minusHours(1));
-
         // System.out.println(transactionRepository.checkRegion(request.getDate()));
         Transaction.TransactionProcess processStatus = Transaction.TransactionProcess.ALLOWED;
         if (suspiciousIPRepository.findSuspiciousIPByIpAddress(request.getIp()).isPresent()) {
