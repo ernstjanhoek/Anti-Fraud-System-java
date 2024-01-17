@@ -43,18 +43,49 @@ public class AntiFraudController {
                 200L,
                 1500L
         );
-        transactionRepository.save(transaction);
         System.out.println("Total entries:" + transactionRepository.count());
-        System.out.println("IpCheck: " + transactionRepository.checkIp(request.getDate(), request.getIp()));
-        System.out.println("RegionCheck: " + transactionRepository.checkRegion(request.getDate(), request.getRegion()));
+        int ipCheck = transactionRepository.countDistinctIps(
+                request.getDate().minusSeconds(3600),
+                request.getDate(),
+                request.getIp(),
+                request.getNumber()
+        );
+        System.out.println("IpCheck: " + ipCheck);
+        int regionCheck = transactionRepository.countDistinctRegions(
+                request.getDate().minusSeconds(3600),
+                request.getDate(),
+                request.getRegion(),
+                request.getNumber()
+        );
+        System.out.println("RegionCheck: " + regionCheck);
         Transaction.TransactionProcess processStatus = Transaction.TransactionProcess.ALLOWED;
+        boolean suspiciousIp = false;
+        boolean stolenCard = false;
         if (suspiciousIPRepository.findSuspiciousIPByIpAddress(request.getIp()).isPresent()) {
             processStatus = Transaction.TransactionProcess.PROHIBITED;
             transaction.appendInfo("ip");
+            suspiciousIp = true;
         }
         if (stolenCardRepository.findStolenCardByNumber(request.getNumber()).isPresent()) {
             processStatus = Transaction.TransactionProcess.PROHIBITED;
             transaction.appendInfo("card-number");
+            stolenCard = true;
+        }
+        if (ipCheck >= 3) {
+            processStatus = Transaction.TransactionProcess.PROHIBITED;
+            transaction.appendInfo("ip-correlation");
+        }
+        if (regionCheck >= 3) {
+            processStatus = Transaction.TransactionProcess.PROHIBITED;
+            transaction.appendInfo("region-correlation");
+        }
+        if (ipCheck >= 2 && processStatus != Transaction.TransactionProcess.PROHIBITED) {
+            processStatus = Transaction.TransactionProcess.MANUAL_PROCESSING;
+            transaction.appendInfo("ip-correlation");
+        }
+        if (regionCheck >= 2 && processStatus != Transaction.TransactionProcess.PROHIBITED) {
+            processStatus = Transaction.TransactionProcess.MANUAL_PROCESSING;
+            transaction.appendInfo("region-correlation");
         }
         if (request.getAmount() > transaction.getManualLimit()) {
             processStatus = Transaction.TransactionProcess.PROHIBITED;
@@ -63,6 +94,7 @@ public class AntiFraudController {
             processStatus = Transaction.TransactionProcess.MANUAL_PROCESSING;
             transaction.appendInfo("amount");
         }
+        transactionRepository.save(transaction);
         return new TransactionDTO(processStatus.toString(), transaction.buildInfoString());
     }
 
