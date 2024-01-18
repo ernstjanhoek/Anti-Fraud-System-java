@@ -32,7 +32,7 @@ public class Transaction {
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime date;
     private String result;
-    private String feedback;
+    private String feedback = "";
     @NonNull
     @Transient
     private Long allowedLimit;

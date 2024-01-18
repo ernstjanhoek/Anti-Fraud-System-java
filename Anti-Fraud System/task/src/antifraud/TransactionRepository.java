@@ -38,9 +38,11 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
         entry.ifPresentOrElse(tx -> {
             if (feedback.equals(tx.getFeedback()) || feedback.equals(tx.getResult())) {
                 throw new FeedbackProcessingException();
+            } else {
+                System.out.println(feedback);
+                tx.setFeedback(feedback);
+                save(tx);
             }
-            tx.setFeedback(feedback);
-            save(tx);
         }, () -> {
             throw new EmptyResultDataAccessException(id);
         });
