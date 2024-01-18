@@ -49,7 +49,6 @@ public class Transaction {
            Collections.sort(infoStringArray);
            return String.join(", ", infoStringArray);
         }
-
     }
     public enum TransactionProcess {
         ALLOWED, PROHIBITED, MANUAL_PROCESSING

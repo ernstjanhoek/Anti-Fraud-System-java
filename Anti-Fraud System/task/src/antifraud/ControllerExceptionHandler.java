@@ -1,5 +1,6 @@
 package antifraud;
 
+import antifraud.AntiFraudExceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,5 +32,9 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(LockStateException.class)
     public ResponseEntity<String> handleLockState() {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+    @ExceptionHandler(FeedbackProcessingException.class)
+    public ResponseEntity<String> handleInvalidFeedback() {
+        return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }

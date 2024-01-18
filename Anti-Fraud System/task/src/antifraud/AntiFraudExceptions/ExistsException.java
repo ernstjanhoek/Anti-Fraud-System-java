@@ -1,4 +1,4 @@
-package antifraud;
+package antifraud.AntiFraudExceptions;
 
 
 import org.springframework.http.HttpStatus;

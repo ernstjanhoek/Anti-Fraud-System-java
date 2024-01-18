@@ -1,11 +1,11 @@
-package antifraud;
+package antifraud.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class UserDTO {
+public class UserResponse {
     private long id;
     private String username;
     private String name;

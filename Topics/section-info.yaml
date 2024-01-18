@@ -1,3 +1,4 @@
 content:
   - Function composition
   - Infinite streams
+  - toString()

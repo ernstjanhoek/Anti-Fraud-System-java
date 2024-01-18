@@ -42,6 +42,9 @@
                          .requestMatchers(HttpMethod.GET, "/api/antifraud/suspicious-ip").hasAuthority("SUPPORT")
                          .requestMatchers(HttpMethod.POST, "/api/antifraud/suspicious-ip").hasAuthority("SUPPORT")
                          .requestMatchers(HttpMethod.DELETE, "/api/antifraud/suspicious-ip/{ip}").hasAuthority("SUPPORT")
+                         .requestMatchers(HttpMethod.PUT, "/api/antifraud/transaction").hasAuthority("SUPPORT")
+                         .requestMatchers(HttpMethod.GET, "/api/antifraud/history/{number}").hasAuthority("SUPPORT")
+                         .requestMatchers(HttpMethod.GET, "/api/antifraud/history").hasAuthority("SUPPORT")
                  )
                  .sessionManagement(session -> session
                          .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // no session

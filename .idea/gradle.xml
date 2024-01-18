@@ -80,6 +80,12 @@
             <option value="$PROJECT_DIR$/Topics/Taking elements/The behavior of a method" />
             <option value="$PROJECT_DIR$/Topics/Taking elements/The name of a method" />
             <option value="$PROJECT_DIR$/Topics/Taking elements/Theory" />
+            <option value="$PROJECT_DIR$/Topics/toString()/Class hierarchy" />
+            <option value="$PROJECT_DIR$/Topics/toString()/Convert persons and patients to string" />
+            <option value="$PROJECT_DIR$/Topics/toString()/Convert vehicles and cars to string" />
+            <option value="$PROJECT_DIR$/Topics/toString()/Theory" />
+            <option value="$PROJECT_DIR$/Topics/toString()/Time as a string" />
+            <option value="$PROJECT_DIR$/Topics/toString()/Users as strings" />
             <option value="$PROJECT_DIR$/util" />
           </set>
         </option>

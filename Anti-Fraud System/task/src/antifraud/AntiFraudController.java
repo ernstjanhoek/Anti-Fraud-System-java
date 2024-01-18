@@ -1,5 +1,7 @@
 package antifraud;
 
+import antifraud.AntiFraudExceptions.*;
+import antifraud.DTO.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
@@ -30,7 +32,7 @@ public class AntiFraudController {
         this.transactionRepository = transactionRepository;
     }
     @PostMapping("/api/antifraud/transaction")
-    public TransactionDTO postTransaction(Principal principal, @Valid @RequestBody TransactionRequest request) {
+    public TransactionResponse postTransaction(Principal principal, @Valid @RequestBody TransactionRequest request) {
         if (userRepository.findUserByUsername(principal.getName()).get().getLockstate().isState(LockState.LOCK)) {
             throw new LockStateException();
         }
@@ -43,33 +45,30 @@ public class AntiFraudController {
                 200L,
                 1500L
         );
-        System.out.println("Total entries:" + transactionRepository.count());
+        transactionRepository.save(transaction);
+
         int ipCheck = transactionRepository.countDistinctIps(
                 request.getDate().minusSeconds(3600),
                 request.getDate(),
                 request.getIp(),
                 request.getNumber()
         );
-        System.out.println("IpCheck: " + ipCheck);
+
         int regionCheck = transactionRepository.countDistinctRegions(
                 request.getDate().minusSeconds(3600),
                 request.getDate(),
                 request.getRegion(),
                 request.getNumber()
         );
-        System.out.println("RegionCheck: " + regionCheck);
+
         Transaction.TransactionProcess processStatus = Transaction.TransactionProcess.ALLOWED;
-        boolean suspiciousIp = false;
-        boolean stolenCard = false;
         if (suspiciousIPRepository.findSuspiciousIPByIpAddress(request.getIp()).isPresent()) {
             processStatus = Transaction.TransactionProcess.PROHIBITED;
             transaction.appendInfo("ip");
-            suspiciousIp = true;
         }
         if (stolenCardRepository.findStolenCardByNumber(request.getNumber()).isPresent()) {
             processStatus = Transaction.TransactionProcess.PROHIBITED;
             transaction.appendInfo("card-number");
-            stolenCard = true;
         }
         if (ipCheck >= 3) {
             processStatus = Transaction.TransactionProcess.PROHIBITED;
@@ -94,13 +93,12 @@ public class AntiFraudController {
             processStatus = Transaction.TransactionProcess.MANUAL_PROCESSING;
             transaction.appendInfo("amount");
         }
-        transactionRepository.save(transaction);
-        return new TransactionDTO(processStatus.toString(), transaction.buildInfoString());
+        return new TransactionResponse(processStatus.toString(), transaction.buildInfoString());
     }
 
     @PostMapping("/api/auth/user")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDTO postUser(@Valid @RequestBody UserRequest request) {
+    public UserResponse postUser(@Valid @RequestBody UserRequest request) {
         if (userRepository.findUserByUsername(request.getUsername()).isPresent()) {
             throw new ExistsException();
         }
@@ -113,15 +111,15 @@ public class AntiFraudController {
             user.setAuthority("MERCHANT");
         }
         userRepository.save(user);
-        return new UserDTO(user.getId(), request.getUsername(), request.getName(), user.getAuthority());
+        return new UserResponse(user.getId(), request.getUsername(), request.getName(), user.getAuthority());
     }
 
     @GetMapping("/api/auth/list")
-    public ArrayList<UserDTO> getUsers() {
-        ArrayList<UserDTO> response = new ArrayList<>();
+    public ArrayList<UserResponse> getUsers() {
+        ArrayList<UserResponse> response = new ArrayList<>();
         Iterable<User> dbResults = userRepository.findAll();
         dbResults.forEach(e -> response.add(
-                new UserDTO(
+                new UserResponse(
                         e.getId(),
                         e.getUsername(),
                         e.getName(),
@@ -138,7 +136,7 @@ public class AntiFraudController {
     }
 
     @PutMapping("/api/auth/role")
-    public RoleDTO changeRole(@Valid @RequestBody RoleRequest request) {
+    public RoleResponse changeRole(@Valid @RequestBody RoleRequest request) {
         Optional<User> userOptional = userRepository.findUserByUsername(request.getUsername());
         userOptional.ifPresentOrElse(e -> {
             if (request.getRole().equals(e.getAuthority())) {
@@ -147,23 +145,23 @@ public class AntiFraudController {
             e.setAuthority(request.getRole());
             userRepository.save(e);
         }, () -> { throw new NotFoundException(); });
-        return new RoleDTO(
+        return new RoleResponse(
                 userOptional.get().getId(),
                 userOptional.get().getUsername(),
                 userOptional.get().getName(),
                 request.getRole());
     }
     @PutMapping("/api/auth/access")
-    public AccessDTO changeAccess(@Valid @RequestBody AccessRequest request) { // }, @PathVariable String state) {
+    public AccessResponse changeAccess(@Valid @RequestBody AccessRequest request) { // }, @PathVariable String state) {
         Optional<User> userOptional = userRepository.findUserByUsername(request.getUsername());
         userOptional.ifPresentOrElse(e -> {
             e.setLockstate(LockState.valueOf(request.getOperation()));
             userRepository.save(e);
         }, () -> { throw new NotFoundException(); });
-        return new AccessDTO("User " + request.getUsername() + " " + LockState.valueOf(request.getOperation().toUpperCase()) + "!");
+        return new AccessResponse("User " + request.getUsername() + " " + LockState.valueOf(request.getOperation().toUpperCase()) + "!");
     }
     @PostMapping("/api/antifraud/stolencard")
-    public StolenCardDTO postCard(@Valid @RequestBody StolenCardRequest request) {
+    public StolenCardResponse postCard(@Valid @RequestBody StolenCardRequest request) {
         if (!LuhnCheck.cardNumValidation(request.getNumber()) || !LuhnCheck.isValidLuhn(request.getNumber())) {
             throw new InvalidInputException();
         }
@@ -173,14 +171,14 @@ public class AntiFraudController {
         StolenCard card = new StolenCard();
         card.setNumber(request.getNumber());
         stolenCardRepository.save(card);
-        return new StolenCardDTO(card.getId(), card.getNumber());
+        return new StolenCardResponse(card.getId(), card.getNumber());
     }
     @GetMapping("/api/antifraud/stolencard")
-    public ArrayList<StolenCardDTO> getCards() {
-        ArrayList<StolenCardDTO> response = new ArrayList<>();
+    public ArrayList<StolenCardResponse> getCards() {
+        ArrayList<StolenCardResponse> response = new ArrayList<>();
         Iterable<StolenCard> dbResults = stolenCardRepository.findAll();
         dbResults.forEach(e -> response.add(
-                new StolenCardDTO(
+                new StolenCardResponse(
                         e.getId(),
                         e.getNumber()
                 )
@@ -197,21 +195,21 @@ public class AntiFraudController {
         return "{ \"status\": \"Card " + dbResult.get().getNumber() + " successfully removed!\"}";
     }
     @PostMapping("/api/antifraud/suspicious-ip")
-    public SuspiciousIPDTO postSuspiciousIP(@Valid @RequestBody SuspiciousIPRequest request) {
+    public SuspiciousIpResponse postSuspiciousIP(@Valid @RequestBody SuspiciousIPRequest request) {
         if (suspiciousIPRepository.findSuspiciousIPByIpAddress(request.getIp()).isPresent()) {
             throw new ExistsException();
         }
         SuspiciousIP ip = new SuspiciousIP();
         ip.setIpAddress(request.getIp());
         suspiciousIPRepository.save(ip);
-        return new SuspiciousIPDTO(ip.getId(), ip.getIpAddress());
+        return new SuspiciousIpResponse(ip.getId(), ip.getIpAddress());
     }
     @GetMapping("/api/antifraud/suspicious-ip")
-    public ArrayList<SuspiciousIPDTO> getIP() {
-        ArrayList<SuspiciousIPDTO> response = new ArrayList<>();
+    public ArrayList<SuspiciousIpResponse> getIP() {
+        ArrayList<SuspiciousIpResponse> response = new ArrayList<>();
         Iterable<SuspiciousIP> dbResults = suspiciousIPRepository.findAll();
         dbResults.forEach(e -> response.add(
-                new SuspiciousIPDTO(
+                new SuspiciousIpResponse(
                         e.getId(),
                         e.getIpAddress()
                 )
@@ -227,4 +225,13 @@ public class AntiFraudController {
         dbResult.ifPresentOrElse(suspiciousIPRepository::delete, () -> { throw new NotFoundException();});
         return "{ \"status\": \"IP " + dbResult.get().getIpAddress() + " successfully removed!\"}";
     }
+    @GetMapping("/api/antifraud/history")
+    public ArrayList<TransactionResponse> getHistory() {
+        return null;
+    }
+    @GetMapping("/api/antifraud/history/{number}")
+    public ArrayList<TransactionResponse> getCardHistory(@PathVariable int number) {
+        return null;
+    }
+
 }

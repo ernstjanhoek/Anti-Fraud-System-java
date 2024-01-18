@@ -1,4 +1,4 @@
-package antifraud;
+package antifraud.DTO;
 
 import jakarta.validation.constraints.Min;
 

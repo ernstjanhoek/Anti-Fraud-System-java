@@ -1,15 +1,15 @@
-package antifraud;
+package antifraud.DTO;
 
+import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor(force = true)
-public class AccessRequest {
+public class RoleRequest {
     @NotBlank
     private final String username;
-    // @Pattern(regexp = "LOCK|UNLOCK")
-    private final String operation;
+    @Pattern(regexp = "SUPPORT|MERCHANT")
+    private final String role;
 }

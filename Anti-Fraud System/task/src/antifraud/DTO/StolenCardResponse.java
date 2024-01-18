@@ -1,11 +1,11 @@
-package antifraud;
+package antifraud.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class SuspiciousIPDTO {
+public class StolenCardResponse {
     private long id;
-    private String ip;
+    private String number;
 }
