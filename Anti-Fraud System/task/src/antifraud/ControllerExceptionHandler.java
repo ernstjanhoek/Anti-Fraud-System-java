@@ -37,4 +37,8 @@ public class ControllerExceptionHandler {
     public ResponseEntity<String> handleInvalidFeedback() {
         return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
     }
+    @ExceptionHandler(FeedbackAlreadySetException.class)
+    public ResponseEntity<String> handleFeedbackSet() {
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
+    }
 }

@@ -28,7 +28,7 @@ public class FeedbackResponse {
         tx.getRegion(),
         tx.getDate(),
         tx.getResult(),
-        tx.getResult()
+        tx.getFeedback()
         );
     }
 }

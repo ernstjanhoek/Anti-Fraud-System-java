@@ -2,8 +2,10 @@ package antifraud;
 
 import antifraud.AntiFraudExceptions.*;
 import antifraud.DTO.*;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -18,32 +20,59 @@ public class AntiFraudController {
     private final SuspiciousIPRepository suspiciousIPRepository;
     private final StolenCardRepository stolenCardRepository;
     private final TransactionRepository transactionRepository;
+    private final CardLimitsRepository cardLimitsRepository;
     private final PasswordEncoder passwordEncoder;
     public AntiFraudController(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             SuspiciousIPRepository suspiciousIPRepository,
             StolenCardRepository stolenCardRepository,
-            TransactionRepository transactionRepository) {
+            TransactionRepository transactionRepository,
+            CardLimitsRepository cardLimitsRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.suspiciousIPRepository = suspiciousIPRepository;
         this.stolenCardRepository = stolenCardRepository;
         this.transactionRepository = transactionRepository;
+        this.cardLimitsRepository = cardLimitsRepository;
     }
     @PostMapping("/api/antifraud/transaction")
     public TransactionResponse postTransaction(Principal principal, @Valid @RequestBody TransactionRequest request) {
         if (userRepository.findUserByUsername(principal.getName()).get().getLockstate().isState(LockState.LOCK)) {
             throw new LockStateException();
         }
+
+        final long[] allowedLimit = {200};
+        final long[] prohibitedLimit = {1500};
+
+        cardLimitsRepository
+                .findById(request.getNumber())
+                .ifPresentOrElse(
+                        l -> {
+                            System.out.println("CARD EXISTS");
+                            allowedLimit[0] = l.getAllowedLimit();
+                            prohibitedLimit[0] = l.getProhibitedLimit();
+                        },
+                        () -> {
+                            System.out.println("NEW CARD ADDED");
+                            cardLimitsRepository.save(
+                                            new CardLimits(
+                                                    request.getNumber(),
+                                                    allowedLimit[0],
+                                                    prohibitedLimit[0]
+                                            )
+                                    );
+                        }
+                );
+
         Transaction transaction = new Transaction(
                 request.getAmount(),
                 request.getIp(),
                 request.getNumber(),
                 request.getRegion(),
                 request.getDate(),
-                200L,
-                1500L
+                allowedLimit[0],
+                prohibitedLimit[0]
         );
 
         int ipCheck = transactionRepository.countDistinctIps(
@@ -248,8 +277,47 @@ public class AntiFraudController {
     }
     @PutMapping("/api/antifraud/transaction")
     public FeedbackResponse setFeedback(@Valid @RequestBody FeedbackRequest request) {
-        transactionRepository.setFeedback(request.getTransactionId(), request.getFeedback());
+        Optional<Transaction> transaction = transactionRepository.findById(request.getTransactionId());
+        transaction.ifPresentOrElse(tx -> {
+                    if (request.getFeedback().equals(tx.getResult())) {
+                        throw new FeedbackProcessingException();
+                    }
+                    if (!tx.getFeedback().isEmpty()) {
+                        throw new FeedbackAlreadySetException();
+                    } else {
+                        tx.setFeedback(request.getFeedback());
+                        transactionRepository.save(tx);
+                    }
+                }, () -> {
+                    throw new EmptyResultDataAccessException(request.getTransactionId());
+                }
+        );
+        Optional<CardLimits> cardLimitEntry = cardLimitsRepository.findById(transaction.get().getNumber());
+        cardLimitEntry.ifPresentOrElse(e -> {
+            if (request.getFeedback().equals("ALLOWED") && transaction.get().getResult().equals("PROHIBITED")) {
+                e.setAllowedLimit(CardLimitMath.increase(e.getAllowedLimit(), transaction.get().getAmount()));
+                e.setProhibitedLimit(CardLimitMath.increase(e.getProhibitedLimit(), transaction.get().getAmount()));
+            }
+            if (request.getFeedback().equals("ALLOWED") && transaction.get().getResult().equals("MANUAL_PROCESSING")) {
+                e.setAllowedLimit(CardLimitMath.increase(e.getAllowedLimit(), transaction.get().getAmount()));
+            }
+            if (request.getFeedback().equals("MANUAL_PROCESSING") && transaction.get().getResult().equals("PROHIBITED")) {
+                e.setProhibitedLimit(CardLimitMath.increase(e.getProhibitedLimit(), transaction.get().getAmount()));
+            }
+            if (request.getFeedback().equals("MANUAL_PROCESSING") && transaction.get().getResult().equals("ALLOWED")) {
+                e.setAllowedLimit(CardLimitMath.decrease(e.getAllowedLimit(), transaction.get().getAmount()));
+            }
+            if (request.getFeedback().equals("PROHIBITED") && transaction.get().getResult().equals("MANUAL_PROCESSING")) {
+                e.setProhibitedLimit(CardLimitMath.decrease(e.getProhibitedLimit(), transaction.get().getAmount()));
+            }
+            if (request.getFeedback().equals("PROHIBITED") && transaction.get().getResult().equals("ALLOWED")) {
+                e.setProhibitedLimit(CardLimitMath.decrease(e.getProhibitedLimit(), transaction.get().getAmount()));
+                e.setAllowedLimit(CardLimitMath.decrease(e.getAllowedLimit(), transaction.get().getAmount()));
+            }
+            cardLimitsRepository.save(e);
+        }, () -> {
+            throw new NotFoundException();
+        });
         return FeedbackResponse.fromTransaction(transactionRepository.findById(request.transactionId).get());
     }
-
 }

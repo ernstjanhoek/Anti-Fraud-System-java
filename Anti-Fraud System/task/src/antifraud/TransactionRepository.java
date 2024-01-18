@@ -1,5 +1,6 @@
 package antifraud;
 
+import antifraud.AntiFraudExceptions.FeedbackAlreadySetException;
 import antifraud.AntiFraudExceptions.FeedbackProcessingException;
 import antifraud.Transaction;
 import jakarta.transaction.Transactional;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface TransactionRepository extends CrudRepository<Transaction, Integer> {
+    Optional<Transaction> findFirstByNumber(String cardNumber);
     Iterable<Transaction> findAllByNumber(String cardNumber);
     @Query("SELECT count(DISTINCT t.ip) FROM Transaction t " +
             "WHERE :ip <> t.ip " +
@@ -32,14 +34,15 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
                                  @Param("region") String region,
                                  @Param("number") String number
      );
-    @Transactional
     default void setFeedback(Integer id, String feedback) {
         Optional<Transaction> entry = findById(id);
         entry.ifPresentOrElse(tx -> {
-            if (feedback.equals(tx.getFeedback()) || feedback.equals(tx.getResult())) {
+            if (feedback.equals(tx.getResult())) {
                 throw new FeedbackProcessingException();
+            }
+            if (!tx.getFeedback().isEmpty()) {
+                throw new FeedbackAlreadySetException();
             } else {
-                System.out.println(feedback);
                 tx.setFeedback(feedback);
                 save(tx);
             }
