@@ -45,7 +45,6 @@ public class AntiFraudController {
                 200L,
                 1500L
         );
-        transactionRepository.save(transaction);
 
         int ipCheck = transactionRepository.countDistinctIps(
                 request.getDate().minusSeconds(3600),
@@ -93,6 +92,8 @@ public class AntiFraudController {
             processStatus = Transaction.TransactionProcess.MANUAL_PROCESSING;
             transaction.appendInfo("amount");
         }
+        transaction.setResult(processStatus.toString());
+        transactionRepository.save(transaction);
         return new TransactionResponse(processStatus.toString(), transaction.buildInfoString());
     }
 
@@ -226,11 +227,27 @@ public class AntiFraudController {
         return "{ \"status\": \"IP " + dbResult.get().getIpAddress() + " successfully removed!\"}";
     }
     @GetMapping("/api/antifraud/history")
-    public ArrayList<TransactionResponse> getHistory() {
-        return null;
+    public ArrayList<Transaction> getHistory() {
+        ArrayList<Transaction> response = new ArrayList<>();
+        Iterable<Transaction> transactionsList =  transactionRepository.findAll();
+        transactionsList.forEach(response::add);
+        return response;
     }
     @GetMapping("/api/antifraud/history/{number}")
-    public ArrayList<TransactionResponse> getCardHistory(@PathVariable int number) {
+    public ArrayList<Transaction> getCardHistory(@PathVariable String number) {
+        if (!LuhnCheck.cardNumValidation(number) || !LuhnCheck.isValidLuhn(number)) {
+            throw new InvalidInputException();
+        }
+        ArrayList<Transaction> response = new ArrayList<>();
+        Iterable<Transaction> transactionsList =  transactionRepository.findAllByNumber(number);
+        transactionsList.forEach(response::add);
+        if (response.isEmpty()) {
+            throw new NotFoundException();
+        }
+        return response;
+    }
+    @PutMapping("/api/antifraud/transaction")
+    public FeedbackResponse setFeedback(@Valid @RequestBody FeedbackRequest request) {
         return null;
     }
 

@@ -1,5 +1,6 @@
 package antifraud;
 
+import antifraud.Transaction;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -7,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 
 public interface TransactionRepository extends CrudRepository<Transaction, Integer> {
+    Iterable<Transaction> findAllByNumber(String cardNumber);
     @Query("SELECT count(DISTINCT t.ip) FROM Transaction t " +
             "WHERE :ip <> t.ip " +
             "AND t.date BETWEEN :start_time AND :end_time " +

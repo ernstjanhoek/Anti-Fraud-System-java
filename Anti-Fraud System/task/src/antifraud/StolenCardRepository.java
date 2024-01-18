@@ -1,5 +1,6 @@
 package antifraud;
 
+import antifraud.StolenCard;
 import org.springframework.data.repository.CrudRepository;
 import java.util.Optional;
 
