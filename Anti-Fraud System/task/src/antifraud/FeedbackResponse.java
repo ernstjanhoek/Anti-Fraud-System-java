@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class FeedbackResponse {
-    private long id;
+    private long transactionId;
     private long amount;
     private String ip;
     private String number;

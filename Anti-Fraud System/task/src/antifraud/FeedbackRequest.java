@@ -6,8 +6,7 @@ import lombok.Data;
 
 @Data
 public class FeedbackRequest {
-    @NotBlank
-    long transsactionId;
+    int transactionId;
     @Pattern(regexp = "ALLOWED|MANUAL_PROCESSING|PROHIBITED")
     String feedback;
 }

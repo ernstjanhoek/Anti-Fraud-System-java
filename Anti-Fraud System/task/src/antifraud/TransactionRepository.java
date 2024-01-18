@@ -1,11 +1,16 @@
 package antifraud;
 
+import antifraud.AntiFraudExceptions.FeedbackProcessingException;
 import antifraud.Transaction;
+import jakarta.transaction.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface TransactionRepository extends CrudRepository<Transaction, Integer> {
     Iterable<Transaction> findAllByNumber(String cardNumber);
@@ -27,4 +32,17 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
                                  @Param("region") String region,
                                  @Param("number") String number
      );
+    @Transactional
+    default void setFeedback(Integer id, String feedback) {
+        Optional<Transaction> entry = findById(id);
+        entry.ifPresentOrElse(tx -> {
+            if (feedback.equals(tx.getFeedback()) || feedback.equals(tx.getResult())) {
+                throw new FeedbackProcessingException();
+            }
+            tx.setFeedback(feedback);
+            save(tx);
+        }, () -> {
+            throw new EmptyResultDataAccessException(id);
+        });
+    }
 }

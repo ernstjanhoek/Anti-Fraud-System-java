@@ -227,20 +227,20 @@ public class AntiFraudController {
         return "{ \"status\": \"IP " + dbResult.get().getIpAddress() + " successfully removed!\"}";
     }
     @GetMapping("/api/antifraud/history")
-    public ArrayList<Transaction> getHistory() {
-        ArrayList<Transaction> response = new ArrayList<>();
+    public ArrayList<FeedbackResponse> getHistory() {
+        ArrayList<FeedbackResponse> response = new ArrayList<>();
         Iterable<Transaction> transactionsList =  transactionRepository.findAll();
-        transactionsList.forEach(response::add);
+        transactionsList.forEach(tx -> response.add(FeedbackResponse.fromTransaction(tx)));
         return response;
     }
     @GetMapping("/api/antifraud/history/{number}")
-    public ArrayList<Transaction> getCardHistory(@PathVariable String number) {
+    public ArrayList<FeedbackResponse> getCardHistory(@PathVariable String number) {
         if (!LuhnCheck.cardNumValidation(number) || !LuhnCheck.isValidLuhn(number)) {
             throw new InvalidInputException();
         }
-        ArrayList<Transaction> response = new ArrayList<>();
+        ArrayList<FeedbackResponse> response = new ArrayList<>();
         Iterable<Transaction> transactionsList =  transactionRepository.findAllByNumber(number);
-        transactionsList.forEach(response::add);
+        transactionsList.forEach(tx -> response.add(FeedbackResponse.fromTransaction(tx)));
         if (response.isEmpty()) {
             throw new NotFoundException();
         }
@@ -248,7 +248,8 @@ public class AntiFraudController {
     }
     @PutMapping("/api/antifraud/transaction")
     public FeedbackResponse setFeedback(@Valid @RequestBody FeedbackRequest request) {
-        return null;
+        transactionRepository.setFeedback(request.getTransactionId(), request.getFeedback());
+        return FeedbackResponse.fromTransaction(transactionRepository.findById(request.transactionId).get());
     }
 
 }
