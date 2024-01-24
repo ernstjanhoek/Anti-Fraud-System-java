@@ -49,12 +49,10 @@ public class AntiFraudController {
                 .findById(request.getNumber())
                 .ifPresentOrElse(
                         l -> {
-                            System.out.println("CARD EXISTS");
                             allowedLimit[0] = l.getAllowedLimit();
                             prohibitedLimit[0] = l.getProhibitedLimit();
                         },
                         () -> {
-                            System.out.println("NEW CARD ADDED");
                             cardLimitsRepository.save(
                                             new CardLimits(
                                                     request.getNumber(),
